@@ -2,12 +2,13 @@
 layout: post
 title:  "Design for a JSON-based logging system"
 date:   2017-08-18 18:00:00 +0200
-categories: Qt JSON logging software design
+category: programming
+tags: Qt JSON logging software design
 ---
 
 # Preface
 
-We all have been there: 
+We all have been there:
 
 Things in our programs go wrong and it is debug time.
 Or people tell us that things go wrong, but can't tell what exactly they did to trigger the error.
@@ -20,7 +21,7 @@ Multi-threading makes sure that everyting gets mixed up a bit and finding the on
 "Proper logging for the rescue", we yell and turn to the internet for a ready-to-use solution.
 But nothing really seem to fit. Some systems are just pimped 'print' instructions and others have the perceived complexity of a mars mission.
 
-Looks like we write our own logging system, like everyone before us. 
+Looks like we write our own logging system, like everyone before us.
 
 # The Aims and the Not-Aims
 
@@ -28,6 +29,7 @@ This article will deal with a very basic design of a logging system for use in c
 While it will focus on the implementation using C++11 (or newer) and _Qt_ it's principles should be easily transferrable to other languages and frameworks.
 
 The main focus lies on
+
 * __Simplicity__
   It should be very easy to understand how this system works and to use it.
 
@@ -41,7 +43,7 @@ The main focus lies on
 To achieve this a few sacrifices have to be made:
 
 * __Speed__
-  The resulting system will only be sufficiently fast. 
+  The resulting system will only be sufficiently fast.
   Don't even try to build something like this into a real-time system.
 
 * __Memory efficiency__
@@ -69,7 +71,7 @@ Let's have a closer look at the core components.
 
 Here is the root of our logging system.
 
-Since usually one application wide instance is sufficient, a [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) might be appropriate. 
+Since usually one application wide instance is sufficient, a [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) might be appropriate.
 This is hinted by the inclusion of the `getInstance`-method.
   (I am aware that a lot of people frown upon this pattern and they have good arguments for that. It's optional.)
 
@@ -80,28 +82,138 @@ When requested the `Log Manager` will create new `Logger`s, and add `Log Rendere
 
 This is where most of the action happens.
 
-One can have one or multiple `Logger`s for different use cases. 
+One can have one or multiple `Logger`s for different use cases.
 (E.g. one per subsystem, or per severity level, or per user, or … you get the idea.)
 Each of these `Logger`s can be connected to `Log Renderer`s via an [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern).
 In this setup the `Log Renderer`s act as the _observers_ and the notification of these is integrated into the `log(…)`-method.
 Also when calling `log(…)`, a new `Log Message` is created and stored within the `Logger`.
 
+When creating a new message the `Logger` may insert additional information on its own like a timestamp or the subsystem name.
+
 ## Log Message
+
+In this class the flexibility magic happens.
+
+The `Log Message` is derived from a `QJson Object` which allows us to store arbitrary information and additional data in such a message.
+It is the concrete implementations decision which fields there are and of which type they are.
+The important part is that these meanings have to be clear throughout the logging system.
+For practicality reasons, additional `QLson Value`s can be attached to messages to modify them further.
+In an ideal case however, the messages are never exposed outside the logging system and all the interactions regarding them happen through the `Logger` and `Log Renderer`s.
+
+### Possible Structure of a Log Message
+
+To aid the understanding of the flexibility a bit more, a basic example of a `Log Message` in JSON representation shall be given.
+
+``` JSON
+{
+    "timestamp": 1503322242,
+    "source": "Model Subsystem",
+    "text": "Attempted division by 0",
+    "details": {
+        "function": "divide",
+        "arguments": {
+            "dividend": 12.65,
+            "divisor": 0
+        },
+    },
+    "severity": 2
+}
+```
+
+While this is only one possibility of many, it highlights how features that are usually to be expected in log messages can be represented.
+* The _timestamp_ is given as [_Unix_time_](https://en.wikipedia.org/wiki/Unix_time) which makes representation very easy and helps a lot with sorting and filtering.
+* The _source_ in this case may be the name of the `Logger` that produced the message, which also is named after the subsystem it represents.
+* The _text_ holds the short error message itself.
+* The _details_ object here contains the name of the called function and its arguments. Feel free to expand this into a full stack trace or represent it as an array of strings or whatever you need - go wild!
+* A _severity_ allows to figure out how grave the event is and can, for example, influence rendering properties like color and font size.
+
+If we now decide to upgrade our logging system to have a new feature, it can be inserted without any trouble by adding more fields in the JSON.
 
 ## Log Renderer
 
+Time to display what we logged.
+
+The rendering interacts with the `Logger` as discussed above.
+For that purpose an abstract (or in C++ terms: virtual) class is used.
+A concrete `Log Renderer` implementation obtains the `Log Message` via notification and decides on its own what to do with it.
+
+This may include anything from simple formatting and printing to buffering and writing to long term storage or sending them somewhere via the internet.
+The possibilities are endless.
+
+It should be noted that renderers should ignore JSON fields in the message they do not know about, and should provide meaningful default values for fields they required but were not included in the message.
+This way a very robust system can be achieved and the same message can be handled by the most different kind of rendereres.
+
 # The Life-Cycle
+
+In this section a examplary logging system life cycle will be outlined to illustrate the interactions between the parts a bit more.
+
+1. The application starts and a `Log Manager` gets instantiated.
+2. Each subsystem creates a `Logger`. The graphics subsystem also creates a custom `Log Renderer` specialized for displaying log messages in a sorted fashion.
+3. The `Log Renderer` gets registered at all `Loggers`.
+4. During their life time, the subsystems use the `log(…)` method of their respective `Logger` to generate `Log Messages` that get forwarded the `Log Renderer` who in turn displays them.
+5. On subsytem shutdown, the subsystems `Logger` unregisters the `Log Renderer` and gets destroyed.
+6. On shutdown of the graphics system the `Log Renderer` gets unregistered from all remaining `Loggers`. From this point on, no more messages can be displayed.
+7. The application shuts down and the `Log Manager` gets destroyed.
 
 # Finer Details
 
-* Logging levels
-* handling binary data
-* shortcuts for certain logging scenarios
-* Log history, filtering and sorting
+A few specific topics that come to mind when talking about logging shall not be omitted here.
+
+## Log Levels
+
+Usually a log level (aka _severity_) refers to a representation of how urgent, important or impactful a message is.
+Commonly people use a fixed set of values like _Debug_, _Verbose_, _Info_, _Default_, _Error_, _Critical_ or something alike.
+When representing these as pure strings it becomes more readable on the outset, but harder to sort.
+By using a numerical representation sorting and filtering is far easier but readability suffers; And what if one suddenly needs to include a new log level in between?
+
+The best compromise seems to define enumerations and find a good policy of dividing up the available range of available numbers (since most people, for the sake of simplicity, use a (32 or 64 bit) integer anyway).
+
+A posibility would be to define the _default_ in the middle of the number range (in case of signed integers: 0) and insert all other levels by further bisecting the available number ranges.
+Something along the lines of
+
+```
+enum LogLevel {
+    Lowest      = INT_MIN,
+    Verbose     = INT_MIN / 2,      // = Default + Lowest / 2
+    Default     = 0,                // = INT_MAX + INT_MIN / 2
+    Error       = INT_MAX / 2,      // = Highest + Default / 2
+    Critical    = (INT_MAX / 4) * 3 // = Error + Highest / 2
+    Highest     = INT_MAX
+}
+/*
+ * Of course you would write down proper pre-calculated hex numbers
+ * instead of these convoluted calculations.
+ * They are for demonstration purposes only.
+ */
+```
+
+## Handling Binary Data
+
+Let's assume you want to attach a [_BLOB_](https://en.wikipedia.org/wiki/Binary_large_object) to your log message (like a screenshot or a memory dump).
+How do you embed this into JSON?
+
+One approach is to just encode it as [_Base64_](https://en.wikipedia.org/wiki/Base64) and insert it as a string.
+Maybe it can be better represented as a JSON object on its own as well.
+Finally there is a variant called [_BSON_](http://bsonspec.org/) (short for binary JSON) that can handle such things.
+But in this case you will have to use a specialized library to read / write your log message objects, since default JSON libraries do not support it.
+
+## Additional Miscellaneous Considerations
+
+* For handling common logging scenarios, it might be a good idea to extend the `Logger` to offer shortcuts for frequent tasks.
+* The `Logger` may retain the `Log Message`s to keep a log history and may push all previous messages to a newly registered `Log Renderer`.
+* Sorting and filtering messages should always be the renderers task. 
 
 # Implementation Notes
 
-* use monotonic clock to provide timestamps
-* use shared pointers
+The original implementation of this system is part of a commercial application so it may not be published here.
+What can be shared however are some implementation specific notes regarding the realization of such a system in C++ and _Qt_.
 
+* It is highly recommendable to use the monotonic system clock to provide timestamps. This guarantees that each timestamp is unique and can double-serve as a message ID. The impact on precision is negligible since the timestamp resolution is usually far greater than the frequency with which your application can create log messages. For pretty rendering, timestamps are usually converted into local time anyway and one rarely is interested in more then microsecond resolution.
+* Using shared pointers is mandatory. Trying to keep track of all the objects flying around via raw pointers will be hard and make everything far more complicated, especially when handling `Log Message`s. Handing around pure objects is no option either because if your message grow larger, you wil incur a noticable perfomace penalty. _Qt_ offers its own pretty (and standard-compatible) shared pointers and there is no excuse to not use them.
+* The log levels handle wonderfully when combined with `QEnum` since it allows handling the enumerations name as `QString` without additional magic required on the application programmers side. This makes rendering them a pure bliss.
 
+---
+
+# Article History
+
+* 21.08.2017 - Finished writing the initial version
