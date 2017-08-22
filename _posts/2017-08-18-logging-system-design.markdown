@@ -121,7 +121,7 @@ To aid the understanding of the flexibility a bit more, a basic example of a `Lo
 ```
 
 While this is only one possibility of many, it highlights how features that are usually to be expected in log messages can be represented.
-* The _timestamp_ is given as [_Unix_time_](https://en.wikipedia.org/wiki/Unix_time) which makes representation very easy and helps a lot with sorting and filtering.
+* The _timestamp_ is given as [_Unix time_](https://en.wikipedia.org/wiki/Unix_time) which makes representation very easy and helps a lot with sorting and filtering.
 * The _source_ in this case may be the name of the `Logger` that produced the message, which also is named after the subsystem it represents.
 * The _text_ holds the short error message itself.
 * The _details_ object here contains the name of the called function and its arguments. Feel free to expand this into a full stack trace or represent it as an array of strings or whatever you need - go wild!
@@ -217,4 +217,4 @@ What can be shared however are some implementation specific notes regarding the 
 # Article History
 
 * 21.08.2017 - Finished writing the initial version
-* 22.08.2017 - Corrected phrasing by removing redundant use of the  same word
+* 22.08.2017 - Corrected phrasing by removing redundant use of the  same word and fixing misplaced underscore
