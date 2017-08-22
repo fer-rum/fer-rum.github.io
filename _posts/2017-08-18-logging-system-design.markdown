@@ -166,7 +166,7 @@ Commonly people use a fixed set of values like _Debug_, _Verbose_, _Info_, _Defa
 When representing these as pure strings it becomes more readable on the outset, but harder to sort.
 By using a numerical representation sorting and filtering is far easier but readability suffers; And what if one suddenly needs to include a new log level in between?
 
-The best compromise seems to define enumerations and find a good policy of dividing up the available range of available numbers (since most people, for the sake of simplicity, use a (32 or 64 bit) integer anyway).
+The best compromise seems to define enumerations and find a good policy of dividing up the range of available numbers (since most people, for the sake of simplicity, use a (32 or 64 bit) integer anyway).
 
 A posibility would be to define the _default_ in the middle of the number range (in case of signed integers: 0) and insert all other levels by further bisecting the available number ranges.
 Something along the lines of
@@ -217,3 +217,4 @@ What can be shared however are some implementation specific notes regarding the 
 # Article History
 
 * 21.08.2017 - Finished writing the initial version
+* 22.08.2017 - Corrected phrasing by removing redundant use of the  same word
