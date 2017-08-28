@@ -22,7 +22,7 @@
         <path d="M584 243 L584 328 L796 328 L796 243 Z"/>
       </clipPath>
       <clipPath clipPathUnits="userSpaceOnUse" id="clipPath7">
-        <path d="M110 72 L110 100 L210 100 L210 72 Z"/>
+        <path d="M110 478 L110 506 L210 506 L210 478 Z"/>
       </clipPath>
       <clipPath clipPathUnits="userSpaceOnUse" id="clipPath8">
         <path d="M397 402 L397 430 L563 430 L563 402 Z"/>
@@ -91,11 +91,11 @@
       <text x="589" xml:space="preserve" y="317.4902" clip-path="url(#clipPath6)" font-family="sans-serif" stroke="none">render(message : LogMessage)</text>
     </g>
     <g fill="rgb(197,232,197)" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,15,15)" stroke="rgb(197,232,197)">
-      <rect x="110" width="100" height="28" y="72" clip-path="url(#clipPath2)" stroke="none"/>
+      <rect x="110" width="100" height="28" y="478" clip-path="url(#clipPath2)" stroke="none"/>
     </g>
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,15,15)" stroke-linecap="butt">
-      <rect fill="none" x="110" width="100" height="28" y="72" clip-path="url(#clipPath2)"/>
-      <text x="115.3188" font-size="13px" y="89.0669" clip-path="url(#clipPath7)" font-family="sans-serif" stroke="none" font-weight="bold" xml:space="preserve">QJsonObject</text>
+      <rect fill="none" x="110" width="100" height="28" y="478" clip-path="url(#clipPath2)"/>
+      <text x="115.3188" font-size="13px" y="495.0669" clip-path="url(#clipPath7)" font-family="sans-serif" stroke="none" font-weight="bold" xml:space="preserve">QJsonObject</text>
     </g>
     <g fill="rgb(218,197,232)" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,15,15)" stroke="rgb(218,197,232)">
       <rect x="397" width="166" height="28" y="402" clip-path="url(#clipPath2)" stroke="none"/>
@@ -131,9 +131,9 @@
       <path fill="white" d="M680 172.0348 L685 179.0348 L680 186.0348 L675 179.0348 Z" clip-path="url(#clipPath2)" stroke="none"/>
       <path fill="none" d="M680 172.0348 L685 179.0348 L680 186.0348 L675 179.0348 Z" clip-path="url(#clipPath2)"/>
       <path fill="none" d="M583.9614 290 L505.0385 290" clip-path="url(#clipPath2)"/>
-      <path fill="none" d="M160 115.035 L160 386.465" clip-path="url(#clipPath2)"/>
-      <path fill="white" d="M160 100.035 L154 116.035 L166 116.035 Z" clip-path="url(#clipPath2)" stroke="none"/>
-      <path fill="none" d="M160 100.035 L154 116.035 L166 116.035 Z" clip-path="url(#clipPath2)"/>
+      <path fill="none" d="M160 452.502 L160 477.9688" clip-path="url(#clipPath2)"/>
+      <path fill="white" d="M160 445.502 L165 452.502 L160 459.502 L155 452.502 Z" clip-path="url(#clipPath2)" stroke="none"/>
+      <path fill="none" d="M160 445.502 L165 452.502 L160 459.502 L155 452.502 Z" clip-path="url(#clipPath2)"/>
       <path fill="none" d="M680 343.7946 L680 420 L563.0286 420" clip-path="url(#clipPath2)"/>
       <path fill="white" d="M680 328.7946 L674 344.7946 L686 344.7946 Z" clip-path="url(#clipPath2)" stroke="none"/>
       <path fill="none" d="M680 328.7946 L674 344.7946 L686 344.7946 Z" clip-path="url(#clipPath2)"/>

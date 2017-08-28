@@ -73,10 +73,11 @@ Here is the root of our logging system.
 
 Since usually one application wide instance is sufficient, a [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) might be appropriate.
 This is hinted by the inclusion of the `getInstance`-method.
-  (I am aware that a lot of people frown upon this pattern and they have good arguments for that. It's optional.)
+(I am aware that a lot of people frown upon this pattern and they have good arguments for that. It's optional.)
 
 When requested the `Log Manager` will create new `Logger`s, and add `Log Renderer`s to keep track of them and provide acces to them if requested.
-  (The reason why the `Log Manager` does not actually create `Log Renderer`s itself is because the latter may become rather heterogenous as will be discussed below. Unless you want to go full _Java_ and build a [_factory_](https://en.wikipedia.org/wiki/Factory_method_pattern)…)
+The reason why the `Log Manager` does not actually create `Log Renderer`s itself in this sketch is because the latter may become rather heterogenous as will be discussed below.
+In _Java_ one would build a [_factory_](https://en.wikipedia.org/wiki/Factory_method_pattern) for this reason, while in C++ it can be done with template magic.
 
 ## Logger
 
@@ -92,12 +93,12 @@ When creating a new message the `Logger` may insert additional information on it
 
 ## Log Message
 
-In this class the flexibility magic happens.
+In this class the flexibility comes into play.
 
-The `Log Message` is derived from a `QJson Object` which allows us to store arbitrary information and additional data in such a message.
+The `Log Message` contains a `QJson Object` which allows us to store arbitrary information and additional data in such a message.
 It is the concrete implementations decision which fields there are and of which type they are.
 The important part is that these meanings have to be clear throughout the logging system.
-For practicality reasons, additional `QLson Value`s can be attached to messages to modify them further.
+For practicality reasons, additional `QJson Value`s can be attached to messages to modify them further.
 In an ideal case however, the messages are never exposed outside the logging system and all the interactions regarding them happen through the `Logger` and `Log Renderer`s.
 
 ### Possible Structure of a Log Message
@@ -181,11 +182,18 @@ enum LogLevel {
     Highest     = INT_MAX
 }
 /*
- * Of course you would write down proper pre-calculated hex numbers
- * instead of these convoluted calculations.
- * They are for demonstration purposes only.
+ * Of course you might write down proper pre-calculated values instead
+ * of these convoluted calculations.
+ * They have the advantage that the compiler can evaluate these expressions at
+ * compile time.
+ * But unlike pre-calculated numbers, these are not portable between
+ * architectures with different bit sizes.
  */
 ```
+
+An alternative approach would be to hold these log levels in a map of numeric keys and string values.
+This offers a high flexibility when it comes to dynamically adding new log levels on the fly.
+It is also advantageous to reserve one log level to express an _undefined_ level that may result from incomplete data or parsing errors.
 
 ## Handling Binary Data
 
@@ -201,7 +209,7 @@ But in this case you will have to use a specialized library to read / write your
 
 * For handling common logging scenarios, it might be a good idea to extend the `Logger` to offer shortcuts for frequent tasks.
 * The `Logger` may retain the `Log Message`s to keep a log history and may push all previous messages to a newly registered `Log Renderer`.
-* Sorting and filtering messages should always be the renderers task. 
+* Sorting and filtering messages should always be the renderers task.
 
 # Implementation Notes
 
@@ -218,3 +226,4 @@ What can be shared however are some implementation specific notes regarding the 
 
 * 21.08.2017 - Finished writing the initial version
 * 22.08.2017 - Corrected phrasing by removing redundant use of the  same word and fixing misplaced underscore
+* 28.08.2017 - After implementing a quick mockup a few observations and design changes had been made to further reduce the implementation difficulty. The changed text reflects this.
