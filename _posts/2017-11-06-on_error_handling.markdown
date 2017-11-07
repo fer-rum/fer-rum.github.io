@@ -56,20 +56,20 @@ Having to handle *happy little accidents* during the execution of code is probab
 Different handling strategies have evolved along with the programming languages.
 Four of these strategies seem to be prevalent and can appear either isolated, combined or wrapped and masked as something else.
 
-1. **Using Global Variables for Error Indication**
+1. **Using global variables for error indication**
 A special globally visible variable is reserved and the currently executing function uses it to indicate a problem.
-A good example for this approach would be the *errno* variable(contained in *error.h*) that can be found in *C*. (Since *C11* it is no longer global, but thread-local.)
+A good example for this approach would be the *errno* variable(defined in *error.h*) that can be found in *C*. (Since *C11* it is no longer global, but thread-local.)
 
-2. **Return them as Part of the Function Call**
-An alternative would be to return the error code directly as a result of the function call or employ [output parameters](https://en.wikipedia.org/wiki/Parameter_(computer_programming)#Output_parameter), if the language permits.
+2. **Return them as part of the function call**
+Error codes can be returned either directly as a result of the function call or using [output parameters](https://en.wikipedia.org/wiki/Parameter_(computer_programming)#Output_parameter), if the language permits.
 
-3. **Throw an Exception**
+3. **Throw an exception**
 At some point in the past, the concept of *exceptions* became fashionable.
 People started to cram it in every language they could think of, whether the basic concepts of the language supported such modifications or not.
 It took developers a few decades to figure out that this holy grail was probably a cup of mercury as well.
-The main problem here is that these Exceptions mess with the control flow of the application, which is fundamentally the same thing for which *goto* was shunned until it became nearly extinct (apart from a few niches where it is still relevant).
+The main problem here is that these Exceptions mess with the control flow of the application by making it non-obvious, which is fundamentally the same thing for which *goto* was shunned until it became nearly extinct (apart from a few niches where it is still relevant).
 
-4. **Handle them as Types on their own**
+4. **Handle them as types on their own**
 The basic idea in this concept is that errors are objects like everything else in OOP-world.
 This way, the errors stop being something special and become a more normal piece of the everyday programming live. Or do they?
 Especially in combination with a language with a solid type concept, this can be rather promising.
@@ -88,18 +88,18 @@ Languages mostly use their already available non-error-related means to express 
 This results in strategies covered by 1), 2) and 4).
 For good reason, one rarely extends an existing language to entice completely new constructs.
 Newly created languages seem to prefer going with strategy 4) instead of offering means to express and handle errors.
-This would be a valid approach if (and only if) errors were actually types, but, again, I remain sceptic that this conveys the whole truth.
+This would be a valid approach if (and only if) errors were actually types, but, again, I remain sceptical that this conveys the whole truth.
 
 When designing languages we currently seem to be a bit entrenched on mapping everything to the concepts of functions and objects. (Yes, I completely ignore AOP here. This is a very different *frankensteinian* beast.)
 
-## Susupect 2: The Programmer (and It's natural Environment)
+## Suspect 2: The Programmer (and Its Natural Environment)
 
 If you ask developers about the ratio between lines of code and handled workload they will come up with something like
 
 `80% of the programs workload is handled by 20% of the code.`
 
 Inversely, the remaining 80% of the codebase are only there to handle 20% of the workload.
-The numbers may vary, but it is always a rather big percentatge versus a rather small percentage (which I arbitrarily define as at least 25% apart).
+The numbers may vary, but it is always a rather big percentage versus a rather small percentage (which I arbitrarily define as at least 25% apart).
 The 80/20 estimation seems to be somewhat common.
 This might be related to the [Pareto principle](https://en.wikipedia.org/wiki/Pareto_principle), but I found no sources actually linking the intuition, the principle and at least statistical or empiric evidence.
 
@@ -110,7 +110,7 @@ Several reasons come to mind:
 * In companies, especially smaller ones, economic pressure can force the developers to get as much functionality done as fast as possible.
 No time remains for doing proper error handling and checking the code for potential pitfalls.
 * Academic projects suffer from a similar symptom. The code needs to be working as fast as possible to get the associated paper ready before the deadline. No one expects this code to be used anywhere else.
-* And last but not least there are the spare-time open source projects which are mostly driven by the pure desire to get something done. This is a limited resource as well and often not sufficient to cover the boring task of seaching for all the places where the code might break.
+* And last but not least there are the spare-time open source projects which are mostly driven by the pure desire to get something done. Such motivation is a limited resource as well and often not sufficient to cover the boring task of seaching for all the places where the code might break.
 
 # My Conclusions
 
@@ -123,7 +123,7 @@ Sometimes a piece of the foundation gives way and then we can observe how even t
 There are a few (fuzzy) points I want to make here:
 
 * Languages should focus more on the handling of anormal application states. This would probably include introducing appropriate syntax and semantics. Dealing with *things that can go wrong* is a growing core issue in an ever more complex software world.
-* Ignoring errors should only be done explicitly. The compiler should always warn about ignored errors and offers an option to treat ignored errors as conpile errors (in case you need to write critical code).
+* Ignoring errors should only be done explicitly. The compiler should always warn about ignored errors and offers an option to treat ignored errors as compile errors (in case you need to write critical code).
 * Business and Reseach practicises need to adapt more to the need of developers to have the time (and ressources) available to review, rewrite and rethink their code. Sadly we can not easily increase the motivation of unfunded open-source projects, except by offering languages in which error handling is easy and fun to do.
 * We need to continue seaching for error handling strategies, for we might not have found our programmer-paradise yet, but it might still be out there somewhere.
 
@@ -132,7 +132,7 @@ There are a few (fuzzy) points I want to make here:
 Here are a few of the sources which I consulted and found to add something to the overall topic.
 A lot of the finer details covered in these were omitted to keep the text at a reasonable length.
 
-* *Weimer* and *Necula* wrote a [quite extensive survey](http://web.eecs.umich.edu/~weimerw/p/weimer-toplas2008.pdf) on the topic of exceptions and their impact on programming, critically examining the shortcomings of this concept and offering approaches to counteract them.
+* *Weimer* and *Necula* wrote a [quite extensive survey](http://web.eecs.umich.edu/~weimerw/p/weimer-toplas2008.pdf) on the topic of exceptions and their impact on programming, examining the pitfalls of this concept and offering approaches to counteract them.
 
 * *Joe Duffy* wrote a [rather long blog post](http://joeduffyblog.com/2016/02/07/the-error-model/) in which he explored the topic in a similar fashion.
 Since his approach focuses on *Microsoft*'s *Midori* project, he naturally proposes a different solution.
@@ -143,3 +143,7 @@ His initial detailed analysis of the topic is a good read, whether you agree wit
 * *Gavin King* [also discussed](https://ceylon-lang.org/blog/2015/12/14/failure/) how typing and error handling can go hand in hand - at least most of the time.
 
 * *Laurence Tratt* discussed the impact of error handling on code size [in a blog post](http://tratt.net/laurie/blog/entries/a_proposal_for_error_handling.html) with regards to (mostly) *C* and went with the language-extension approach to tackle the issue.
+
+# Article History
+* 06.11.2017 - Published initial Version
+* 07.11.2017 - After first feedback a Typos got fixed and unclear phrasing was improved
